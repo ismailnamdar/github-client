@@ -5,6 +5,10 @@
   "dependencies": {
     "@apollo/react-hooks": "^3.1.2",
     "apollo-boost": "^0.4.4",
+    "apollo-cache-inmemory": "^1.6.3",
+    "apollo-client": "^2.6.4",
+    "apollo-link-context": "^1.0.19",
+    "apollo-link-http": "^1.5.16",
     "cypress": "^3.4.1",
     "graphql": "^14.5.8",
     "react": "^16.10.2",
