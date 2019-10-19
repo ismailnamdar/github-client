@@ -1,9 +1,21 @@
-import React from "react";
+import React, { useCallback } from "react";
+import { useHistory } from "react-router-dom";
 import Table from "./Table";
+import {useTranslation} from "react-i18next";
 
-const RepositoryTable = ({data, columnKeys}) => {
+const RepositoryTable = ({owner, data}) => {
+  let history = useHistory();
+  const { t } = useTranslation("translations");
+  const handleRowClick = useCallback((record) => {
+    history.push({ pathname: '/repository/' + owner + "/" + record.name });
+  }, [owner, history]);
+  const columnConfigs = [
+    {key: 'name', title: t("repoName")},
+    {key: 'description', style: {wordBreak: "break-all"}, title: t("description")},
+    {key: 'forkCount', style: {}, title: t("forkCount")}
+  ];
   return (
-    <Table data={data} columnKeys={['id', 'name', 'description']}/>
+    <Table data={data} onRowClick={handleRowClick} columnConfigs={columnConfigs}/>
   )
 };
 

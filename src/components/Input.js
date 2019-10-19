@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import styled from "styled-components";
 
 const StyledInput = styled.input`
-  height: 36px;
+  height: 28px;
   border-radius: 24px;
   border-style: none;
   background-color: #e8e8e8;

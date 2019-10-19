@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import {useQuery} from "@apollo/react-hooks";
-import styled from "styled-components";
 import pathOr from "ramda/src/pathOr";
 import { READ_OWNER_REPO } from "../data/owner";
 import Input from "../components/Input";
@@ -8,20 +7,8 @@ import {Column, Row} from "../views/Row";
 import ProfileCard from "../views/ProfileCard";
 import RepositoryTable from "../views/RepositoryTable";
 import Pagination from "../views/Pagination";
-
-const SearchBar = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  height: 68px;
-  width: 100%;
-  border-bottom-style: solid;
-  border-width: 1px;
-  border-color: grey;
-  padding: 0.4em;
-  background-color: #333;
-`;
+import Spin from "../views/Spin";
+import NavBar from "../views/NavBar";
 
 /*
 
@@ -65,9 +52,11 @@ const loginSafeGet = pathOr(null, ['repositoryOwner', 'login']);
 const urlSafeGet = pathOr(null, ['repositoryOwner', 'url']);
 const avatarUrlSafeGet = pathOr(null, ['repositoryOwner', 'avatarUrl']);
 const repositoriesSafeGet = pathOr([], ['repositoryOwner', 'repositories', 'nodes']);
+const pageInfoSafeGet = pathOr({}, ['repositoryOwner', 'repositories', 'pageInfo']);
 const OwnerContainer = () => {
   const [searchValue, setSearchValue] = useState("reactjs");
-  const {data = {}, error, loading} = useQuery(READ_OWNER_REPO, { variables: {login: searchValue}});
+  const [cursor, setCursor] = useState({});
+  const {data = {}, error, loading} = useQuery(READ_OWNER_REPO, { variables: {login: searchValue, ...cursor}});
   const flatData = {
     id: idSafeGet(data),
     login: loginSafeGet(data),
@@ -78,21 +67,38 @@ const OwnerContainer = () => {
       name: d.name,
       description: d.description,
       forkCount: d.forkCount
-    }))
+    })),
+    pageInfo: pageInfoSafeGet(data)
   };
+  const handlePrevClick = useCallback(() => {
+    setCursor({before: flatData.pageInfo.startCursor});
+  }, [setCursor, flatData]);
+  const handleNextClick = useCallback(() => {
+    setCursor({after: flatData.pageInfo.endCursor});
+  }, [setCursor, flatData]);
   return (
     <>
-      <SearchBar>
+      <NavBar>
         <Input initialValue={searchValue} width={"50%"} onChange={setSearchValue}/>
-      </SearchBar>
+      </NavBar>
       <Row style={{ flexWrap: 'wrap', width: '100%' }}>
         <Column style={{minWidth: '300px', flex: 1, padding: '1em', alignItems: 'center' }}>
           <ProfileCard url={flatData.url} imageUrl={flatData.avatarUrl} title={flatData.login}/>
         </Column>
         <Column style={{minWidth: '300px', flex: 8, padding: '1em'}}>
           <div style={{ height: '100%', width: '100%' }}>
-            <RepositoryTable data={flatData.repositories} />
-            <Pagination/>
+            <Spin spinning={true}/>
+            <Spin spinning={loading}>
+              <>
+                <RepositoryTable data={flatData.repositories} owner={searchValue}/>
+                <Pagination
+                  style={{ marginTop: "0.5em"}}
+                  hasNextPage={flatData.pageInfo.hasNextPage}
+                  hasPreviousPage={flatData.pageInfo.hasPreviousPage}
+                  onPrevClick={handlePrevClick}
+                  onNextClick={handleNextClick}/>
+              </>
+            </Spin>
           </div>
         </Column>
       </Row>

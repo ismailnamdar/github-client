@@ -1,9 +1,9 @@
 import React from "react";
 import styled from "styled-components";
 
-const StyledImg = styled.img`
-  animation: spinner-anim infinite 20s linear;
-  height: 100vh;
+const StyledImg = styled.div`
+  animation: ${props => props.spinning ? "spinner-anim infinite 4s linear" : ""};
+  height: 10vh;
   pointer-events: none;
   @keyframes spinner-anim {
     from {
@@ -19,6 +19,12 @@ const StyledImg = styled.img`
  * @returns {*}
  * @constructor
  */
-const Spin = () => <StyledImg src={""} className="spinner" alt="logo" />;
+const Spin = ({ spinning = false, children = <></> }) => {
+  return spinning ? <div className={"Ids-hourglass"}/> : children;
+  // return (
+  //   spinning ? <StyledImg spinning={spinning} src={"https://www.pngfind.com/pngs/m/268-2684867_svg-spinner-progress-windows-loading-circle-png-transparent.png"} className="spinner" alt="logo"/>
+  //   : children
+  // );
+};
 
 export default Spin;

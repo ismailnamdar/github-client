@@ -12,7 +12,7 @@ function App() {
         <AppRouter/>
       </Provider>
     </GraphqlProvider>
-);
+  );
 }
 
 export default App;
