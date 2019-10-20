@@ -30,6 +30,7 @@ const IssueTable = ({ owner, reponame }) => {
   return (
     <>
       <Table
+        error={error}
         loading={loading}
         data={flatData.issues}
         columnConfigs={columnConfigs}/>

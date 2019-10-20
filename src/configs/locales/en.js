@@ -4,6 +4,8 @@ export default {
     description: "Description",
     forkCount: "Fork Count",
     empty: "Empty",
-    title: "Title"
+    title: "Title",
+    issues: "Issues",
+    pullRequests: "Pull Requests"
   }
 };

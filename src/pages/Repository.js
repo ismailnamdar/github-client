@@ -9,12 +9,14 @@ import octocat from "../assets/Octocat.png";
 import RepositoryCard from "../views/RepositoryCard";
 import PullRequestTable from "../components/PullRequestTable";
 import IssueTable from "../components/IssueTable";
+import {useTranslation} from "react-i18next";
 
 const idSafeGet = pathOr(null, ['repository', 'id']);
 const nameSafeGet = pathOr(null, ['repository', 'name']);
 const descriptionSafeGet = pathOr(null, ['repository', 'description']);
 const urlSafeGet = pathOr(null, ['repository', 'url']);
 const Repository = () => {
+  const { t } = useTranslation("translations");
   let { owner, reponame } = useParams();
   const { data = {}, error, loading } = useQuery(READ_REPO, {variables: {owner, name: reponame}});
   const flatData = {
@@ -24,7 +26,7 @@ const Repository = () => {
     url: urlSafeGet(data)
   };
   return (
-    <>
+    <div className="transition-item list-page">
       <NavBar>
         <Link to={"/"}>
             <img height={48} src={octocat} alt={"github logo"}/>
@@ -40,16 +42,18 @@ const Repository = () => {
         </Column>
         <Column style={{minWidth: '300px', flex: 4, padding: '1em'}}>
           <div style={{ height: '100%', width: '100%' }}>
+            <h1>{t('issues')}</h1>
             <IssueTable owner={owner} reponame={reponame}/>
           </div>
         </Column>
         <Column style={{minWidth: '300px', flex: 4, padding: '1em'}}>
           <div style={{ height: '100%', width: '100%' }}>
+            <h1>{t('pullRequests')}</h1>
             <PullRequestTable owner={owner} reponame={reponame}/>
           </div>
         </Column>
       </Row>
-    </>
+    </div>
   );
 };
 

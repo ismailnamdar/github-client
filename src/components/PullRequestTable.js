@@ -34,6 +34,7 @@ const PullRequestTable = ({ owner, reponame }) => {
   return (
     <>
       <Table
+        error={error}
         loading={loading}
         data={flatData.pullRequests}
         columnConfigs={columnConfigs}/>

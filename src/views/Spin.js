@@ -20,11 +20,7 @@ const StyledImg = styled.div`
  * @constructor
  */
 const Spin = ({ spinning = false, children = <></> }) => {
-  return spinning ? <div className={"Ids-hourglass"}/> : children;
-  // return (
-  //   spinning ? <StyledImg spinning={spinning} src={"https://www.pngfind.com/pngs/m/268-2684867_svg-spinner-progress-windows-loading-circle-png-transparent.png"} className="spinner" alt="logo"/>
-  //   : children
-  // );
+  return spinning ? <div className={"loader"}/> : children;
 };
 
 export default Spin;

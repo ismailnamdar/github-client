@@ -9,6 +9,7 @@ import RepositoryTable from "../views/RepositoryTable";
 import Pagination from "../views/Pagination";
 import Spin from "../views/Spin";
 import NavBar from "../views/NavBar";
+import {getOwner, setOwner} from "../configs/constants";
 
 /*
 
@@ -53,9 +54,10 @@ const urlSafeGet = pathOr(null, ['repositoryOwner', 'url']);
 const avatarUrlSafeGet = pathOr(null, ['repositoryOwner', 'avatarUrl']);
 const repositoriesSafeGet = pathOr([], ['repositoryOwner', 'repositories', 'nodes']);
 const pageInfoSafeGet = pathOr({}, ['repositoryOwner', 'repositories', 'pageInfo']);
+const ONE_PAGE_ELEMENT_SIZE = 10;
 const OwnerContainer = () => {
-  const [searchValue, setSearchValue] = useState("reactjs");
-  const [cursor, setCursor] = useState({});
+  const [searchValue, setSearchValue] = useState(getOwner());
+  const [cursor, setCursor] = useState({first: ONE_PAGE_ELEMENT_SIZE});
   const {data = {}, error, loading} = useQuery(READ_OWNER_REPO, { variables: {login: searchValue, ...cursor}});
   const flatData = {
     id: idSafeGet(data),
@@ -70,16 +72,26 @@ const OwnerContainer = () => {
     })),
     pageInfo: pageInfoSafeGet(data)
   };
+  const handleSearchValueChange = useCallback((newValue) => {
+    setSearchValue(newValue);
+    setOwner(newValue);
+  }, [setSearchValue]);
   const handlePrevClick = useCallback(() => {
-    setCursor({before: flatData.pageInfo.startCursor});
+    setCursor({
+      before: flatData.pageInfo.startCursor,
+      last: ONE_PAGE_ELEMENT_SIZE
+    });
   }, [setCursor, flatData]);
   const handleNextClick = useCallback(() => {
-    setCursor({after: flatData.pageInfo.endCursor});
+    setCursor({
+      after: flatData.pageInfo.endCursor,
+      first: ONE_PAGE_ELEMENT_SIZE
+    });
   }, [setCursor, flatData]);
   return (
     <>
       <NavBar>
-        <Input initialValue={searchValue} width={"50%"} onChange={setSearchValue}/>
+        <Input initialValue={searchValue} width={"50%"} onChange={handleSearchValueChange}/>
       </NavBar>
       <Row style={{ flexWrap: 'wrap', width: '100%' }}>
         <Column style={{minWidth: '300px', flex: 1, padding: '1em', alignItems: 'center' }}>
@@ -87,10 +99,9 @@ const OwnerContainer = () => {
         </Column>
         <Column style={{minWidth: '300px', flex: 8, padding: '1em'}}>
           <div style={{ height: '100%', width: '100%' }}>
-            <Spin spinning={true}/>
             <Spin spinning={loading}>
               <>
-                <RepositoryTable data={flatData.repositories} owner={searchValue}/>
+                <RepositoryTable error={error} data={flatData.repositories} owner={searchValue}/>
                 <Pagination
                   style={{ marginTop: "0.5em"}}
                   hasNextPage={flatData.pageInfo.hasNextPage}

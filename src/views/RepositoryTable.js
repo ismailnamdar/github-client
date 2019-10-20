@@ -3,7 +3,7 @@ import { useHistory } from "react-router-dom";
 import Table from "./Table";
 import {useTranslation} from "react-i18next";
 
-const RepositoryTable = ({owner, data}) => {
+const RepositoryTable = ({owner, error, data}) => {
   let history = useHistory();
   const { t } = useTranslation("translations");
   const handleRowClick = useCallback((record) => {
@@ -15,7 +15,7 @@ const RepositoryTable = ({owner, data}) => {
     {key: 'forkCount', style: {}, title: t("forkCount")}
   ];
   return (
-    <Table data={data} onRowClick={handleRowClick} columnConfigs={columnConfigs}/>
+    <Table error={error} data={data} onRowClick={handleRowClick} columnConfigs={columnConfigs}/>
   )
 };
 

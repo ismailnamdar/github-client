@@ -3,6 +3,7 @@ import styled from "styled-components";
 import PropTypes from "prop-types";
 import Empty from "./Empty";
 import Spin from "./Spin";
+import ErrorComponent from "./Error";
 
 const StyledTable = styled.table`
   border-collapse: collapse;
@@ -26,12 +27,15 @@ const Td = styled.td`
   padding: 0.5em;
 `;
 
-const Table = ({data, loading, columnConfigs, onRowClick}) => {
+const Table = ({data, error, loading, columnConfigs, onRowClick}) => {
   if(loading) {
-    return <Spin/>
+    return <Spin spinning={loading}/>
   }
-  if(data.length === 0) {
+  else if(data.length === 0) {
     return <Empty/>
+  }
+  else if(error) {
+    return <ErrorComponent/>
   }
   return (
     <StyledTable>

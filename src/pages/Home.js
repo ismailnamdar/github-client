@@ -3,7 +3,9 @@ import OwnerContainer from "../containers/OwnerContainer";
 
 const Home = () => {
   return (
-    <OwnerContainer/>
+    <div className="transition-item list-page">
+      <OwnerContainer/>
+    </div>
   );
 };
 

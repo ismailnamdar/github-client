@@ -20,6 +20,7 @@
     "react-i18next": "^10.13.1",
     "react-redux": "^7.1.1",
     "react-router-dom": "^5.1.2",
+    "react-router-page-transition": "^3.1.0",
     "react-scripts": "3.2.0",
     "redux": "^4.0.4",
     "redux-saga": "^1.1.1",
