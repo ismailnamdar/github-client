@@ -5,13 +5,14 @@ import Table from "../views/Table";
 import {READ_PULL_REQUESTS} from "../data/repository";
 import Pagination from "../views/Pagination";
 import {useTranslation} from "react-i18next";
+import {DEFAULT_ONE_PAGE_ELEMENT_SIZE} from "../configs/constants";
 
 const pullRequestsSafeGet = pathOr([], ['repository', 'pullRequests', 'nodes']);
 const pageInfoSafeGet = pathOr({}, ['repository', 'pullRequests', 'pageInfo']);
 
 const PullRequestTable = ({ owner, reponame }) => {
   const { t } = useTranslation("translations");
-  const [cursor, setCursor] = useState({});
+  const [cursor, setCursor] = useState({first: DEFAULT_ONE_PAGE_ELEMENT_SIZE});
   const { data = {}, loading, error} = useQuery(READ_PULL_REQUESTS, { variables: { owner, name: reponame, ...cursor}});
   const flatData = {
     pullRequests: pullRequestsSafeGet(data),
@@ -19,10 +20,16 @@ const PullRequestTable = ({ owner, reponame }) => {
   };
 
   const handlePrevClick = useCallback(() => {
-    setCursor({before: flatData.pageInfo.startCursor});
+    setCursor({
+      before: flatData.pageInfo.startCursor,
+      last: DEFAULT_ONE_PAGE_ELEMENT_SIZE
+    });
   }, [setCursor, flatData]);
   const handleNextClick = useCallback(() => {
-    setCursor({after: flatData.pageInfo.endCursor});
+    setCursor({
+      after: flatData.pageInfo.endCursor,
+      first: DEFAULT_ONE_PAGE_ELEMENT_SIZE
+    });
   }, [setCursor, flatData]);
 
   const columnConfigs = [

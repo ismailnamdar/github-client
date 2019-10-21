@@ -1,6 +1,7 @@
 import React from "react";
 
-const ErrorComponent = () => {
+const ErrorComponent = ({ error }) => {
+  // TODO: handle error here
   return <h1>{"Error"}</h1>
 };
 

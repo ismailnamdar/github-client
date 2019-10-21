@@ -1,11 +1,11 @@
 import React from "react";
 import Label from "./Label";
 
-const RepositoryCard = ({ url, name, description }) => {
+const RepositoryCard = ({ name, description }) => {
   return (
     <>
-    <Label bold>{name}</Label>
-    <Label>{description}</Label>
+      <Label bold>{name}</Label>
+      <Label>{description}</Label>
     </>
   );
 };

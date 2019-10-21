@@ -1,10 +1,8 @@
-import React, {Suspense, lazy} from "react";
-import {BrowserRouter as Router, Route, Switch, useLocation} from "react-router-dom";
+import React, {Suspense} from "react";
+import {BrowserRouter as Router, Route, Switch} from "react-router-dom";
 import Center from "./Center";
 import Spin from "./Spin";
 import PageTransition from "react-router-page-transition";
-// const Home = lazy(() => import('../pages/Home'));
-// const Repository = lazy(() => import('../pages/Repository'));
 import Home from '../pages/Home';
 import Repository from '../pages/Repository';
 

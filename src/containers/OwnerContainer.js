@@ -5,14 +5,95 @@ import { READ_OWNER_REPO } from "../data/owner";
 import Input from "../components/Input";
 import {Column, Row} from "../views/Row";
 import ProfileCard from "../views/ProfileCard";
-import RepositoryTable from "../views/RepositoryTable";
+import RepositoryTable from "../components/RepositoryTable";
 import Pagination from "../views/Pagination";
 import Spin from "../views/Spin";
 import NavBar from "../views/NavBar";
-import {getOwner, setOwner} from "../configs/constants";
+import {DEFAULT_ONE_PAGE_ELEMENT_SIZE, getOwner, setOwner} from "../configs/constants";
+
+const idSafeGet = pathOr(null, ['repositoryOwner', 'id']);
+const loginSafeGet = pathOr(null, ['repositoryOwner', 'login']);
+const urlSafeGet = pathOr(null, ['repositoryOwner', 'url']);
+const avatarUrlSafeGet = pathOr(null, ['repositoryOwner', 'avatarUrl']);
+const repositoriesSafeGet = pathOr([], ['repositoryOwner', 'repositories', 'nodes']);
+const pageInfoSafeGet = pathOr({}, ['repositoryOwner', 'repositories', 'pageInfo']);
+
+const OwnerContainer = () => {
+  const [searchValue, setSearchValue] = useState(getOwner());
+  const [cursor, setCursor] = useState({first: DEFAULT_ONE_PAGE_ELEMENT_SIZE});
+  const {data = {}, error, loading} = useQuery(READ_OWNER_REPO, { variables: {login: searchValue, ...cursor}});
+  const flatData = {
+    id: idSafeGet(data),
+    login: loginSafeGet(data),
+    url: urlSafeGet(data),
+    avatarUrl: avatarUrlSafeGet(data),
+    repositories: repositoriesSafeGet(data).map(d => ({
+      id: d.id,
+      name: d.name,
+      description: d.description,
+      forkCount: d.forkCount
+    })),
+    pageInfo: pageInfoSafeGet(data)
+  };
+
+  const handleSearchValueChange = useCallback((newValue) => {
+    setSearchValue(newValue);
+    setOwner(newValue);
+  }, [setSearchValue]);
+
+  const handlePrevClick = useCallback(() => {
+    setCursor({
+      before: flatData.pageInfo.startCursor,
+      last: DEFAULT_ONE_PAGE_ELEMENT_SIZE
+    });
+  }, [setCursor, flatData]);
+  const handleNextClick = useCallback(() => {
+    setCursor({
+      after: flatData.pageInfo.endCursor,
+      first: DEFAULT_ONE_PAGE_ELEMENT_SIZE
+    });
+  }, [setCursor, flatData]);
+  return (
+    <>
+      <NavBar>
+        <Input initialValue={searchValue} width={"50%"} onChange={handleSearchValueChange}/>
+      </NavBar>
+      <Row style={styles.rowStyle}>
+        <Column style={styles.leftColumn}>
+          <ProfileCard url={flatData.url} imageUrl={flatData.avatarUrl} title={flatData.login}/>
+        </Column>
+        <Column style={styles.rightColumn}>
+          <div style={styles.tableContainer}>
+            <Spin spinning={loading}>
+              <>
+                <RepositoryTable error={error} data={flatData.repositories} owner={searchValue}/>
+                <Pagination
+                  style={styles.pagination}
+                  hasNextPage={flatData.pageInfo.hasNextPage}
+                  hasPreviousPage={flatData.pageInfo.hasPreviousPage}
+                  onPrevClick={handlePrevClick}
+                  onNextClick={handleNextClick}/>
+              </>
+            </Spin>
+          </div>
+        </Column>
+      </Row>
+    </>
+  );
+};
+
+const styles = {
+  rowStyle: { flexWrap: 'wrap', width: '100%' },
+  leftColumn: {minWidth: '300px', flex: 1, padding: '1em', alignItems: 'center' },
+  rightColumn: {minWidth: '300px', flex: 8, padding: '1em' },
+  tableContainer: { height: '100%', width: '100%' },
+  pagination: { marginTop: "0.5em" }
+}
+
+export default OwnerContainer;
 
 /*
-
+Example data
 {
   "data": {
     "repositoryOwner": {
@@ -45,76 +126,4 @@ import {getOwner, setOwner} from "../configs/constants";
     }
   }
 }
-
  */
-
-const idSafeGet = pathOr(null, ['repositoryOwner', 'id']);
-const loginSafeGet = pathOr(null, ['repositoryOwner', 'login']);
-const urlSafeGet = pathOr(null, ['repositoryOwner', 'url']);
-const avatarUrlSafeGet = pathOr(null, ['repositoryOwner', 'avatarUrl']);
-const repositoriesSafeGet = pathOr([], ['repositoryOwner', 'repositories', 'nodes']);
-const pageInfoSafeGet = pathOr({}, ['repositoryOwner', 'repositories', 'pageInfo']);
-const ONE_PAGE_ELEMENT_SIZE = 10;
-const OwnerContainer = () => {
-  const [searchValue, setSearchValue] = useState(getOwner());
-  const [cursor, setCursor] = useState({first: ONE_PAGE_ELEMENT_SIZE});
-  const {data = {}, error, loading} = useQuery(READ_OWNER_REPO, { variables: {login: searchValue, ...cursor}});
-  const flatData = {
-    id: idSafeGet(data),
-    login: loginSafeGet(data),
-    url: urlSafeGet(data),
-    avatarUrl: avatarUrlSafeGet(data),
-    repositories: repositoriesSafeGet(data).map(d => ({
-      id: d.id,
-      name: d.name,
-      description: d.description,
-      forkCount: d.forkCount
-    })),
-    pageInfo: pageInfoSafeGet(data)
-  };
-  const handleSearchValueChange = useCallback((newValue) => {
-    setSearchValue(newValue);
-    setOwner(newValue);
-  }, [setSearchValue]);
-  const handlePrevClick = useCallback(() => {
-    setCursor({
-      before: flatData.pageInfo.startCursor,
-      last: ONE_PAGE_ELEMENT_SIZE
-    });
-  }, [setCursor, flatData]);
-  const handleNextClick = useCallback(() => {
-    setCursor({
-      after: flatData.pageInfo.endCursor,
-      first: ONE_PAGE_ELEMENT_SIZE
-    });
-  }, [setCursor, flatData]);
-  return (
-    <>
-      <NavBar>
-        <Input initialValue={searchValue} width={"50%"} onChange={handleSearchValueChange}/>
-      </NavBar>
-      <Row style={{ flexWrap: 'wrap', width: '100%' }}>
-        <Column style={{minWidth: '300px', flex: 1, padding: '1em', alignItems: 'center' }}>
-          <ProfileCard url={flatData.url} imageUrl={flatData.avatarUrl} title={flatData.login}/>
-        </Column>
-        <Column style={{minWidth: '300px', flex: 8, padding: '1em'}}>
-          <div style={{ height: '100%', width: '100%' }}>
-            <Spin spinning={loading}>
-              <>
-                <RepositoryTable error={error} data={flatData.repositories} owner={searchValue}/>
-                <Pagination
-                  style={{ marginTop: "0.5em"}}
-                  hasNextPage={flatData.pageInfo.hasNextPage}
-                  hasPreviousPage={flatData.pageInfo.hasPreviousPage}
-                  onPrevClick={handlePrevClick}
-                  onNextClick={handleNextClick}/>
-              </>
-            </Spin>
-          </div>
-        </Column>
-      </Row>
-    </>
-  );
-};
-
-export default OwnerContainer;

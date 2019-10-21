@@ -6,6 +6,7 @@ export const LANGUAGE_KEYS = {
 export const GRAPHQL_API_BASE_URL = "https://api.github.com/graphql";
 
 export const DEFAULT_OWNER = "reactjs";
+export const DEFAULT_ONE_PAGE_ELEMENT_SIZE = 10;
 
 const GITHUB_CLIENT_OWNER = "GITHUB_CLIENT_OWNER";
 export const setOwner = (owner) => {

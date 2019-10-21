@@ -1,6 +1,5 @@
 import React from "react";
 import styled from "styled-components";
-import {useTranslation} from "react-i18next";
 import PropTypes from 'prop-types';
 
 const StyledButton = styled.button`
@@ -16,7 +15,6 @@ const StyledButton = styled.button`
 `;
 
 const Pagination = ({ style, hasNextPage, hasPreviousPage, onPrevClick, onNextClick }) => {
-  const { t } = useTranslation("translations");
   return <div style={style}>
     <StyledButton disabled={!hasPreviousPage} onClick={onPrevClick}>
       {"<"}

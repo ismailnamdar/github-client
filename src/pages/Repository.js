@@ -7,14 +7,17 @@ import NavBar from "../views/NavBar";
 import {Column, Row} from "../views/Row";
 import octocat from "../assets/Octocat.png";
 import RepositoryCard from "../views/RepositoryCard";
-import PullRequestTable from "../components/PullRequestTable";
-import IssueTable from "../components/IssueTable";
+import PullRequestTable from "../containers/PullRequestTable";
+import IssueTable from "../containers/IssueTable";
 import {useTranslation} from "react-i18next";
+import Spin from "../views/Spin";
+import ErrorComponent from "../views/Error";
 
 const idSafeGet = pathOr(null, ['repository', 'id']);
 const nameSafeGet = pathOr(null, ['repository', 'name']);
 const descriptionSafeGet = pathOr(null, ['repository', 'description']);
 const urlSafeGet = pathOr(null, ['repository', 'url']);
+
 const Repository = () => {
   const { t } = useTranslation("translations");
   let { owner, reponame } = useParams();
@@ -25,6 +28,9 @@ const Repository = () => {
     description: descriptionSafeGet(data),
     url: urlSafeGet(data)
   };
+  if(error) {
+    return <ErrorComponent error={error}/>;
+  }
   return (
     <div className="transition-item list-page">
       <NavBar>
@@ -32,22 +38,24 @@ const Repository = () => {
             <img height={48} src={octocat} alt={"github logo"}/>
         </Link>
       </NavBar>
-      <Row style={{ flexWrap: 'wrap', width: '100%' }}>
-        <Column style={{minWidth: '300px', flex: 1, padding: '1em', alignItems: 'center' }}>
-          <RepositoryCard
-            url={flatData.url}
-            name={flatData.name}
-            description={flatData.description}
-          />
+      <Row style={styles.row}>
+        <Column style={styles.leftColumn}>
+          <Spin spinning={loading}>
+            <RepositoryCard
+              url={flatData.url}
+              name={flatData.name}
+              description={flatData.description}
+            />
+          </Spin>
         </Column>
-        <Column style={{minWidth: '300px', flex: 4, padding: '1em'}}>
-          <div style={{ height: '100%', width: '100%' }}>
+        <Column style={styles.middleColumn}>
+          <div style={styles.container}>
             <h1>{t('issues')}</h1>
             <IssueTable owner={owner} reponame={reponame}/>
           </div>
         </Column>
-        <Column style={{minWidth: '300px', flex: 4, padding: '1em'}}>
-          <div style={{ height: '100%', width: '100%' }}>
+        <Column style={styles.rightColumn}>
+          <div style={styles.container}>
             <h1>{t('pullRequests')}</h1>
             <PullRequestTable owner={owner} reponame={reponame}/>
           </div>
@@ -55,6 +63,14 @@ const Repository = () => {
       </Row>
     </div>
   );
+};
+
+const styles = {
+  row: { flexWrap: 'wrap', width: '100%' },
+  leftColumn: {minWidth: '300px', flex: 1, padding: '1em', alignItems: 'center' },
+  middleColumn: {minWidth: '300px', flex: 4, padding: '1em'},
+  rightColumn: {minWidth: '300px', flex: 4, padding: '1em'},
+  container: { height: '100%', width: '100%' },
 };
 
 export default Repository;

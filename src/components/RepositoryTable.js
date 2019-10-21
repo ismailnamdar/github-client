@@ -1,6 +1,6 @@
 import React, { useCallback } from "react";
 import { useHistory } from "react-router-dom";
-import Table from "./Table";
+import Table from "../views/Table";
 import {useTranslation} from "react-i18next";
 
 const RepositoryTable = ({owner, error, data}) => {

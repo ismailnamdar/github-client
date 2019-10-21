@@ -29,7 +29,7 @@ export const READ_REPO = gql`
 `;
 
 export const READ_PULL_REQUESTS = gql`
-  query read($owner: String!, $name: String!, $after: String, $before: String) { 
+  query read($owner: String!, $name: String!, $first: Int, $last: Int, $after: String, $before: String) { 
     repository(owner: $owner, name: $name) {
       id
       name
@@ -37,7 +37,7 @@ export const READ_PULL_REQUESTS = gql`
       description
       descriptionHTML
       shortDescriptionHTML
-      pullRequests(first: 10, after: $after, before: $before) {
+      pullRequests(first: $first, last: $last, after: $after, before: $before) {
         totalCount
         pageInfo {
           endCursor
@@ -57,7 +57,7 @@ export const READ_PULL_REQUESTS = gql`
 `;
 
 export const READ_ISSUES = gql`
-  query read($owner: String!, $name: String!, $after: String, $before: String) { 
+  query read($owner: String!, $name: String!, $first: Int, $last: Int, $after: String, $before: String) { 
     repository(owner: $owner, name: $name) {
       id
       name
@@ -65,7 +65,7 @@ export const READ_ISSUES = gql`
       description
       descriptionHTML
       shortDescriptionHTML
-      issues(first: 10, after: $after, before: $before) {
+      issues(first: $first, last: $last, after: $after, before: $before) {
         totalCount
         pageInfo {
           endCursor
