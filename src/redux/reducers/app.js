@@ -1,16 +1,7 @@
 const initialState = {
 };
 
-export const ACTION_TYPE = {
-  HTTP_REQUEST: 'HTTP_REQUEST',
-};
-
-export default function movie(state = initialState, action) {
-  if(action.type === ACTION_TYPE.HTTP_REQUEST) {
-    return {
-      ...state,
-      loading: true
-    };
-  }
+export default function app(state = initialState, action) {
+  // add handlers here
   return state;
 }
